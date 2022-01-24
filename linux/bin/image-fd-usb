@@ -1,0 +1,51 @@
+#!/bin/sh
+
+DEVICE=/dev/sde
+cd "/run/media/dma/Seagate Backup Plus Drive/Discs/Floppy"
+
+umount ${DEVICE}
+
+function _info {
+    echo -ne '\e[32;1m***\e[22m '
+    echo -n $@
+    echo -e '\e[0m'
+}
+
+function _warn {
+    echo -ne '\e[33;1m***\e[31;1m '
+    echo -n $@
+    echo -e '\e[0m'
+}
+
+
+for A in $@
+do
+    echo "================================================================"
+    figlet ${A}
+    echo "================================================================"
+
+    if [ -s ${A}.inq ]
+    then
+        _warn "Already have geometry for ${A}"
+    else
+        _info "Getting geometry for ${A} ..."
+        ufiformat -v -i ${DEVICE} | tee ${A}.inq || _warn "geometry failed with $?"
+    fi
+
+
+    if [ -s ${A}.img ]
+    then
+        _warn "Already have image for ${A}"
+    else
+        _info "Getting image for ${A} ..."
+        ddrescue -d -r 1 ${DEVICE} ${A}.img ${A}.map 2>&1 | tee ${A}.log 
+        gzip ${A}.log
+    fi
+
+    # The ejection is noisy enough to get my attention.
+    # _info "Ejecting media..."
+    # eject ${DEVICE}
+    _info "Done."
+
+done
+

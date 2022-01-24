@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Archives a complete Github repository.
+
+for ARG in $@
+do
+    if [[ "$ARG" =~ ^(https://github.com/)?([-a-zA-Z0-9_.]+)/([-a-zA-Z0-9_.]+)/? ]]
+    then
+        USER_DIR=~/mirrors/github.com/${BASH_REMATCH[2]}
+        mkdir -p ${USER_DIR}
+        pushd ${USER_DIR}
+        git clone --mirror ${ARG}
+        popd
+    fi
+done
+

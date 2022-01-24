@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Simple script to be used whenever I need to grab a copy of a video
+# before it goes poof.
+
+pushd /home/dma/Videos
+for A in "$@"
+do
+    youtube-dl --write-info-json "$A"
+done
+popd
+

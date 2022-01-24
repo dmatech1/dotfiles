@@ -1,0 +1,129 @@
+#!/bin/sh
+
+# This script is intended to archive old CDs and DVDs in case the house burns down or whatever.
+# 
+# ITEM.iso          2048-byte sectors in ISO9660 or UDF format.
+# ITEM.bin          2448-byte sectors with no error correction or deinterleaving performed.
+# ITEM.toc          Table of contents in CDRDAO format.
+# ITEM.di
+# ITEM.log.gz
+# ITEM.atip         More detailed ATIP data from wodim.
+# ITEM.tocbytes     Raw bytes of the TOC.
+# ITEM.dvd          Output from "dvd+rw-mediainfo".
+
+# Prerequisites: wodim (for "wodim" and "readom"), cdrdao, and dvd+rw-tools.
+
+DEVICE=/dev/sr0
+cd "/run/media/dma/Seagate Backup Plus Drive/Discs"
+
+function _info {
+    echo -ne '\e[92m***\e[22m '
+    echo -n $@
+    echo -e '\e[0m'
+}
+
+function _warn {
+    echo -ne '\e[93m***\e[91m '
+    echo -n $@
+    echo -e '\e[0m'
+}
+
+# Command-line options.
+while getopts "d:hbr" OPTNAME
+do
+    case "${OPTNAME}" in
+        d)  DEVICE=${OPTARG};;
+        h)  echo "image-cd [-d device] [-b] [-r]"
+            echo "  -d device       Sets the device.  Default is ${DEVICE}."
+            echo "  -b              Skips the bin/toc ripping with \"cdrdao read-cd\"."
+            echo "  -r              Skips the ddrescue rip to an .iso file."
+            exit
+            ;;
+        b)  skip_readcd=1;;
+        r)  skip_ddrescue=1;;
+    esac
+done
+shift $((OPTIND-1))
+
+# At some point, I suppose I can add support for multiple discs, but I will probably just do one at a time.
+for A in $@
+do
+    # Display a nice big banner so I can see which disc I'm on.
+    echo -e "\e[94m================================================================"
+    figlet -f ~/src/figlet-fonts/Electronic.flf "$A"
+    echo -e "================================================================\e[0m"
+
+    # Wait for the disc to become ready.
+    tray-status ${DEVICE}
+
+    # Get disc information.
+    if [ -s ${A}.di ]
+    then
+        _warn "Already have disk-info output."
+    else
+        _info "Getting disk-info..."
+        cdrdao disk-info --device ${DEVICE} > ${A}.di 2>&1 || _warn "disk-info failed with $?"
+    fi
+
+     # Get the raw TOC data as a bunch of bytes.  I don't know why this might be useful, but why not get it?
+    if [ -s ${A}.tocbytes ]
+    then
+        _warn "Already have binary TOC output."
+    else
+        _info "Getting binary TOC data..."
+        readom dev=${DEVICE} -fulltoc > ${A}.tocbytes 2>&1 || _warn "readom failed with $?"
+    fi
+
+    # Get detailed ATIP data.
+    if [ -s ${A}.atip ]
+    then
+        _warn "Already have ATIP output."
+    else
+        _info "Getting ATIP..."
+        wodim dev=${DEVICE} -atip -v > ${A}.atip 2>&1 || _warn "wodim failed with $?"
+    fi
+
+    # If the ATIP file mentions DVDs, try to get additional details as it suggests.
+    if grep -q 'dvd+rw-mediainfo' ${A}.atip
+    then
+        # See if we need DVD information.
+        if [ -s ${A}.dvd ]
+        then
+            _warn "Already have dvd+rw-mediainfo output."
+        else
+            _info "Getting DVD information..."
+            dvd+rw-mediainfo ${DEVICE} > ${A}.dvd 2>&1
+        fi
+
+        # If it's a DVD, don't attempt to read it as a CD.
+        _info "Skipping cdrdao due to presence of DVD."
+        skip_readcd=1
+    fi
+
+    # Perform a raw TOC/BIN rip of the disc with "cdrdao read-cd".
+    if [ -z "${skip_readcd}" ]
+    then
+        if [ -s ${A}.toc ]
+        then
+            _warn "Already have toc/bin."
+        else
+            _info "Getting toc/bin for ${A} ..."
+            cdrdao read-cd --driver generic-mmc-raw --device ${DEVICE} --read-raw --read-subchan rw_raw -v 3 --datafile ${A}.bin ${A}.toc 2>&1 | tee ${A}.log
+            gzip ${A}.log
+        fi
+    fi
+
+    # readom dev=/dev/sr1 f=2553a.bin -clone -nocorr retries=32 2>&1 | tee 2553a.log
+
+    # Perform a "ddrescue" image to a .iso file if requested.
+    if [ -z "${skip_ddrescue}" ]
+    then
+        _info "Getting ISO image..."
+        ddrescue ${DEVICE} ${A}.iso ${A}.map -u -r 32 -b 2048
+    fi
+
+    # The ejection is noisy enough to get my attention.
+    _info "Done.  Ejecting disc..."
+    eject ${DEVICE}
+
+done

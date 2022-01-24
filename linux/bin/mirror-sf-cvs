@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Archives a SourceForge project's complete CVS history.
+for A in $@
+do
+    fakeroot bash -c "pushd /home/dma/mirrors/cvs.sourceforge.net; rsync -ai a.cvs.sourceforge.net::cvsroot/${A}/ ${A}; tar cJvf ${A}.tar.xz ${A}/; rm -rf ./${A}/"
+done
+
