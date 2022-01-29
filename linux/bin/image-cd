@@ -60,6 +60,9 @@ do
     if [ -s ${A}.di ]
     then
         _warn "Already have disk-info output."
+
+        # Get it anyway as this might fix some issues with cdrdao below.
+        cdrdao disk-info --device ${DEVICE} >/dev/null 2>&1
     else
         _info "Getting disk-info..."
         cdrdao disk-info --device ${DEVICE} > ${A}.di 2>&1 || _warn "disk-info failed with $?"
@@ -69,6 +72,9 @@ do
     if [ -s ${A}.tocbytes ]
     then
         _warn "Already have binary TOC output."
+
+        # This seems to help with the "read-cd" operation below.
+        readom dev=${DEVICE} -fulltoc > /dev/null 2>&1
     else
         _info "Getting binary TOC data..."
         readom dev=${DEVICE} -fulltoc > ${A}.tocbytes 2>&1 || _warn "readom failed with $?"
@@ -100,7 +106,8 @@ do
         skip_readcd=1
     fi
 
-    # Perform a raw TOC/BIN rip of the disc with "cdrdao read-cd".
+    # Perform a raw TOC/BIN rip of the disc with "cdrdao read-cd".  Note that this sometimes hangs for
+    # unknown reasons.  Making sure the TOC is read beforehand seems to help prevent this.
     if [ -z "${skip_readcd}" ]
     then
         if [ -s ${A}.toc ]

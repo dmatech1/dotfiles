@@ -1,0 +1,17 @@
+Windows Registry Editor Version 5.00
+
+; These settings improve the Alt-Tab experience by making the items smaller.
+; When there are many windows, it's difficult to notice that there's more than
+; one page of them.  Since I'm not interested in reading the text of each window
+; in the preview, I can make them a bit smaller.
+; This is documented somewhat at the links below.
+;
+; * https://answers.microsoft.com/en-us/insider/forum/all/registry-customization-for-multitaskingview-mtv/806a0c84-b203-46fb-b23a-acc82dc0ecce
+; * https://superuser.com/a/1203887/771876
+;
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MultitaskingView\AltTabViewHost]
+"Thumbnail_min_width"=dword:00000032
+"Thumbnail_min_height_percent"=dword:00000006
+"Thumbnail_max_height_percent"=dword:00000020
+"Thumbnail_icon_size"=dword:00000020
+
