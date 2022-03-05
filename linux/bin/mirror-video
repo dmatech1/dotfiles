@@ -6,7 +6,7 @@
 pushd /home/dma/Videos
 for A in "$@"
 do
-    youtube-dl --write-info-json "$A"
+    youtube-dl -v --restrict-filenames --write-info-json --all-subs -o "%(title).100s-%(id)s.%(ext)s" "$A"
 done
 popd
 
