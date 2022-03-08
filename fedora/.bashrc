@@ -1,4 +1,4 @@
-# .bashrc: The individual per-interactive-shell startup file.
+# .bashrc
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
@@ -9,6 +9,15 @@ fi
 # export SYSTEMD_PAGER=
 
 # User specific aliases and functions
+function rmbak {
+    rm -v *~
+}
+
+# Shell-specific history configuration.
 HISTSIZE=100000
-set -o ignoreeof
+HISTTIMEFORMAT="%F %T "
+
+# Allow Ctrl+D in non-login shells.
+set +o ignoreeof
+
 
