@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+; Chrome doesn't make it obvious when updates are available.  This gives
+; me a notification within one hour of updates being published.
+;
+; * https://support.google.com/chrome/a/answer/7679871?hl=en
+; * https://chromeenterprise.google/policies/?policy=RelaunchNotification
+; * https://chromeenterprise.google/policies/?policy=RelaunchNotificationPeriod
+;
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+"RelaunchNotification"=dword:00000001
+"RelaunchNotificationPeriod"=dword:0036ee80
