@@ -1,0 +1,9 @@
+[user]
+name = "dmatech1"
+email = 36796590+dmatech1@users.noreply.github.com
+
+[init]
+defaultBranch = master
+
+[core]
+autocrlf = false
