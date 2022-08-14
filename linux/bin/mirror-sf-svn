@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Archives a SourceForge project's complete SVN history.
+for ARG in "$@"
+do
+    # It should match this pattern.
+    if [[ "$ARG" =~ ^(https://svn\.code\.sf\.net/p/(.*)/code/?) ]]
+    then
+        repo=${BASH_REMATCH[2]}
+        repo=${repo/\//-}
+        dest_file=~/mirrors/svn.code.sf.net/${repo}.$(date +%s).dump.xz
+
+        # Now make sure we know the base URL of the repo.
+        if base_url=$(svn info --show-item repos-root-url "${ARG}")
+        then
+            echo ${base_url} -\> ${dest_file}
+            svnrdump dump "$base_url" | xz > ${dest_file}
+        else
+            echo "Unable to determine base URL for '${ARG}'."
+        fi
+    fi
+done
+
