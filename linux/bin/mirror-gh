@@ -10,7 +10,16 @@ do
         mkdir -p ${USER_DIR}
         pushd ${USER_DIR}
         git clone --mirror ${ARG}
+
+        if [ -d "${BASH_REMATCH[3]}.git" ]
+        then
+            cd "${BASH_REMATCH[3]}.git"
+            curl "https://api.github.com/repos/${BASH_REMATCH[2]}/${BASH_REMATCH[3]}" > github.json
+        elif [ -d "${BASH_REMATCH[3]}" ]
+        then
+            cd "${BASH_REMATCH[3]}"
+            curl "https://api.github.com/repos/${BASH_REMATCH[2]}/${BASH_REMATCH[3]}" > github.json
+        fi
         popd
     fi
 done
-
