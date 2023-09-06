@@ -2,9 +2,10 @@
 
 In addition to my primary ISP, I'm using a Verizon Hotspot device.  The plan supposedly doesn't
 have a hard cap or overage charges (only throttling) and costs $10/month.  The device is an
-[Orbic Speec](https://www.verizon.com/internet-devices/verizon-orbic-speed-mobile-hotspot/)
+[Orbic Speed](https://www.verizon.com/internet-devices/verizon-orbic-speed-mobile-hotspot/)
 that supports networking and charging over USB as well as 2.4GHz or 5GHz wireless.
-For now, I'm using USB as I'm already using the wireless radio.
+For now, I'm using USB as I'm already using the wireless radio.  This has the added benefit
+of keeping it charged, although it might wear out the battery faster.
 
 ## Networking Background
 
