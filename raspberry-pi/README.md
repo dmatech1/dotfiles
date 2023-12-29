@@ -6,20 +6,24 @@ or [interactively](https://www.raspberrypi.com/documentation/computers/configura
 ```bash
 # 3 Interface Options       Configure connections to peripherals
 # P2 SSH                    Enable/disable remote command line access using SSH
-sudo raspi-config nonint ?
 
 # 1 System Options          Configure system settings
 # S1 Wireless LAN           Enter SSID and passphrase
 
 # 1 System Options          Configure system settings
 # S7 Splash Screen          Choose graphical splash screen or text boot
-sudo raspi-config nonint do_boot_splash ?
+sudo raspi-config nonint do_boot_splash 1
 ```
-
 
 ## Log Rotation
 
 `/etc/logrotate.conf`
+
+```
+rotate 400
+create
+compress
+```
 
 ## Disabling "CUPS"
 
@@ -46,7 +50,7 @@ I typically get a bunch of extra packages.
 | iputils-tracepath | Tools to trace the network path to a remote host |
 | mtr               | Full screen ncurses and X11 traceroute tool |
 | ncat              | NMAP netcat reimplementation |
-| netcat            | TCP/IP swiss army knife -- transitional package |
+| netcat-openbsd    | TCP/IP swiss army knife |
 | nmap              | The Network Mapper |
 | socat             | multipurpose relay for bidirectional data transfer |
 | tcpdump           | command-line network traffic analyzer |
@@ -55,7 +59,20 @@ I typically get a bunch of extra packages.
 
 | Package           | Description |
 | :---------------- | :---------- |
-| pv
+| pv                | Shell pipeline element to meter data passing through |
+| vim               | Vi IMproved - enhanced vi editor |
+
+```bash
+sudo apt install hping3 iputils-arping iputils-tracepath mtr ncat netcat-openbsd nmap socat tcpdump traceroute wakeonlan pv vim
+```
+
+Also make sure that everything is up to date.
+
+```bash
+sudo apt update -y
+sudo apt list --upgradable
+sudo apt full-upgrade -y
+```
 
 # Device-Specific Configuration
 
@@ -82,3 +99,29 @@ sudo ...
 ## Raspberry Pi 4
 
 This device has enough memory to use X without issues.  But I still disable CUPS because I don't need it.
+
+# Upgrading
+
+Before doing anything, do something like the following to back up the most important stuff.
+
+```bash
+ssh pi@192.168.1.22 sudo tar cJv /root /etc /home/pi /var/lib/dpkg/ > rpi-zero-w-1.tar.xz
+```
+
+Write the newest image to a new Micro SD card and set things up as usual.  Before
+stepping away, be sure to enable SSH and run this command to get the host key fingerprint.
+
+```
+pi@rpi-zero-w-1:~ $ ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+256 SHA256:o3yf+VIptOyDsEHBoZ7drmMTZcQDkDr2gh9KN6EBfZc root@(none) (ED25519)
+```
+
+Until the old keys are restored, use an alternate `known_hosts` file.  Make sure the fingerprint matches what's above.
+
+```
+dma@vestibule:~$ ssh -o UserKnownHostsFile=~/.ssh/RPI_SETUP_KH pi@192.168.1.22
+The authenticity of host '192.168.1.22 (192.168.1.22)' can't be established.
+ED25519 key fingerprint is SHA256:o3yf+VIptOyDsEHBoZ7drmMTZcQDkDr2gh9KN6EBfZc.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+```
