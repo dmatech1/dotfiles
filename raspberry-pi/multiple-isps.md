@@ -74,3 +74,58 @@ then
     fi
 fi
 ```
+
+# NetworkManager Setup
+
+In addition to configuring `/etc/iproute2/rt_tables.d/vzw.conf` as shown
+above, do the following:
+
+```bash
+# Rename it to something more descriptive.
+nmcli connection modify "Wired connection 1" connection.id verizon_4g
+
+# Give it a very high metric so that it won't normally be used.
+nmcli connection modify verizon_4g ipv4.route-metric 3000
+
+# Disable IPv6.
+nmcli connection modify verizon_4g ipv6.method disabled
+```
+
+**Contents of `/etc/NetworkManager/dispatcher.d/80-usb0-route`:**
+```bash
+#!/bin/bash
+# Allow the alternate interface to work a bit more easily.
+#
+# See: https://networkmanager.dev/docs/api/latest/NetworkManager-dispatcher.html
+
+table=vzw
+priority=32700
+
+if [ "${CONNECTION_ID}" = "verizon_4g" ]
+then
+    case $2 in
+        up|dhcp4-change)
+            # Parse out the metric from IP4_ROUTE_0.  We're not currently
+            # using it.
+            if [[ ${IP4_ROUTE_0} =~ (.*)\ (.*)\ (.*) ]]
+            then
+                ifmetric=${BASH_REMATCH[3]}
+            fi
+
+            # Delete any old records for the table and rule pointing to it.
+            ip route flush table ${table}
+            ip rule del priority ${priority} 2>/dev/null
+
+            # Add the new ones.  We don't actually need the metric as this is a separate table.
+            ip route add default via ${DHCP4_ROUTERS} dev ${DEVICE_IP_IFACE} mtu ${DHCP4_INTERFACE_MTU} table ${table}
+            ip rule add priority ${priority} from ${DHCP4_IP_ADDRESS} lookup ${table}
+            ;;
+        
+        down)
+            # Delete the table and the rule pointing to it.
+            ip route flush table ${table}
+            ip rule del priority ${priority} 2>/dev/null
+            ;;
+    esac
+fi
+```
