@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00
+
+; This disables Fast Startup on Windows 10 and 11.  The intention is to allow
+; wake-on-LAN after shutdowns, as Fast Startup appears to break that.
+;
+; * https://petri.com/how-to-disable-windows-10-fast-startup-and-why-you-might-want-to/
+; * https://learn.microsoft.com/en-us/windows/win32/power/system-power-states
+;
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power]
+"HiberbootEnabled"=dword:00000000
