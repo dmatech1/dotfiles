@@ -1,0 +1,9 @@
+Windows Registry Editor Version 5.00
+
+; This should configure the current user's account to automaticaly lock
+; after 5 minutes of activity (300 seconds).
+
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"ScreenSaveActive"="1"
+"ScreenSaverIsSecure"="1"
+"ScreenSaveTimeOut"="300"

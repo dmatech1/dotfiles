@@ -1,0 +1,27 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Search]
+; Attempt to disable Bing Search in the start menu when searching.
+"BingSearchEnabled "=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer]
+; Don't search Bing on the start menu search page.
+"DisableSearchBoxSuggestions"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+; Show ordinary hidden files.
+"Hidden"=dword:00000001
+
+; Show system files.
+"ShowSuperHidden"=dword:00000001
+
+; Show the entire file name.
+"HideFileExt"=dword:00000000
+
+; Don't try to make the paths pretty.  Keep them ugly.
+"DontPrettyPath"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+; Attempt to disable AutoRun entirely for security reasons.
+; See: https://learn.microsoft.com/en-us/windows/win32/shell/autoplay-reg#using-the-registry-to-disable-autorun
+"NoDriveTypeAutoRun"=dword:00000091
