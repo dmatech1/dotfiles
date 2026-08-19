@@ -1,15 +1,14 @@
 {
-    "python.pythonPath": "C:\\Users\\dma\\Anaconda3\\python.exe",
     "workbench.editorAssociations": {
         "*.ipynb": "jupyter-notebook"
     },
-    "python.defaultInterpreterPath": "C:\\Users\\dma\\Anaconda3\\python.exe",
+    "python.defaultInterpreterPath": "C:\\Users\\dma\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
     "notebook.cellToolbarLocation": {
         "default": "right",
         "jupyter-notebook": "left"
     },
     "editor.detectIndentation": false,
-    "git.autofetch": true,
+    "git.autofetch": false,
     "python.analysis.inlayHints.functionReturnTypes": true,
     "python.analysis.typeCheckingMode": "basic",
     "[python]": {
